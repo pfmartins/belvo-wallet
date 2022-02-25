@@ -1,0 +1,22 @@
+.not-found {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.not-found__page {
+    width: 400px;
+    height: 80px;
+    font-size: 32px;
+    color: #333333;
+    line-height: 36px;
+    text-align: center;
+}
+
+.not-found__page > span {
+    font-size: 14px;
+    color: #e8e8e8;
+    font-style: italic;
+}
