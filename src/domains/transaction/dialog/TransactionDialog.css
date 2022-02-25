@@ -1,0 +1,9 @@
+.transaction__form {
+    display: flex;
+    gap: 15px;
+    margin: 20px 0 20px;
+}
+
+.transaction__btn--success {
+    background-color: #2e7d32;
+}
