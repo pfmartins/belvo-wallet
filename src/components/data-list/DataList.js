@@ -10,41 +10,21 @@ import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import Paper from '@mui/material/Paper';
 import TransactionDialog from '../../domains/transaction/dialog/TransactionDialog';
+import * as api from '../../services/Api';
 import './DataList.css';
 
-export default function CheckboxListSecondary() {
-    const [checked, setChecked] = useState([1]);
+const transationTypes = {
+    send: 'send',
+    receive: 'receive'
+}
+
+export default function DataList({ items }) {
     const [open, setOpen] = useState(false);
     const [transactionType, setTransactionType] = useState(null);
     const [contactUser, setContactUser] = useState(null);
 
-    const handleToggle = (value) => () => {
-        const currentIndex = checked.indexOf(value);
-        const newChecked = [...checked];
-
-        if (currentIndex === -1) {
-            newChecked.push(value);
-        } else {
-            newChecked.splice(currentIndex, 1);
-        }
-
-        setChecked(newChecked);
-    };
-
-    const contactList = [
-        {
-            uuid: '23423423234',
-            name: 'Paulo Martins',
-        },
-        {
-            uuid: '21223423234',
-            name: 'Marcos Tito',
-        },
-        {
-            uuid: '566523423234',
-            name: 'Roger Oliveira',
-        }
-    ]
+    const contactList = items;
+    const assets = api.getAssets();
 
     const onTransact = (user, type = '') => {
         setContactUser(user);
@@ -59,8 +39,7 @@ export default function CheckboxListSecondary() {
 
     return (
         <>
-
-            <TransactionDialog open={open} transactionType={transactionType} user={contactUser} handleClose={handleClose} />
+            <TransactionDialog open={open} transactionType={transactionType} transactTo={contactUser} handleClose={handleClose} assets={assets} />
             <Paper elevation={3} className="dashboard__item">
                 <List dense sx={{ width: '100%', bgcolor: 'background.paper', marginTop: '10px' }}>
                     {contactList.map((user) => {
@@ -79,11 +58,11 @@ export default function CheckboxListSecondary() {
                                 <ListItemText id={labelId} primary={`${user.name}`} />
 
                                 <ButtonGroup variant="outlined" aria-label="outlined primary button group">
-                                    <Button color="success" onClick={() => onTransact(user, 'receive')}>
+                                    <Button color="success" onClick={() => onTransact(user, transationTypes.receive)}>
                                         Receive
                                         <DownloadIcon />
                                     </Button>
-                                    <Button onClick={() => onTransact(user, 'send')}>
+                                    <Button onClick={() => onTransact(user, transationTypes.send)}>
                                         Send
                                         <UploadIcon />
                                     </Button>

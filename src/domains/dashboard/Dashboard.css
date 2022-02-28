@@ -1,11 +1,19 @@
 .dashboard__container {
     width: 80%;
 }
+
+.dashboard__grid {
+    margin-top: 20px;
+    margin-bottom: 40px;
+    gap: 25px;
+    display: grid !important;
+    grid-template-columns: 1fr;
+    justify-content: space-around;
+}
 .dashboard__item {
     height: 190px;
     max-height: 190px;
     overflow: hidden;
-    /* min-width: 300px; */
 }
 
 .dashboard__item-title {
@@ -67,4 +75,16 @@
   font-weight: normal;
   padding-bottom: 10px;
   border-bottom: solid 1px #f9f9f9;
+}
+
+@media screen and (min-width: 768px) {
+    .dashboard__grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .dashboard__grid {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
 }
