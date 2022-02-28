@@ -1,4 +1,6 @@
 
+import LocalStorage from './LocalStorage';
+
 const BASE_URL = 'https://belvo-wallet-challenge-api.herokuapp.com';
 
 const trendingCoins = [
@@ -6,13 +8,6 @@ const trendingCoins = [
     { name: 'MATIC (Polygon)', currentValue: 1.79, statusLast24Hours: '+9.94' },
     { name: 'JST (JUST)', currentValue: 0.005081, statusLast24Hours: '+2.5' },
     { name: 'KDA (Kadena)', currentValue: 8.48, statusLast24Hours: '+23' },
-]
-
-const lastTransactions = [
-    { id: 123123123, to: 'Norma Oliveira dos Santos', type: 'Sent', asset: 'ETH', totalValue: 4800 },
-    { id: 567657, to: 'Isabelle Marques', type: 'Receive', asset: 'BTC', totalValue: 1223 },
-    { id: 5345123, to: 'Carlos Macedo', type: 'Send', asset: 'SHIBA', totalValue: 478 },
-    { id: 12365456, to: 'Roger Oliveira', type: 'Receive', asset: 'DOGE', totalValue: 2490 },
 ]
 
 const assets = [
@@ -25,24 +20,12 @@ const assets = [
 ]
 
 const contactList = [
-    {
-        uuid: '23423423234',
-        name: 'Paulo Martins',
-    },
-    {
-        uuid: '21223423234',
-        name: 'Marcos Tito',
-    },
-    {
-        uuid: '566523423234',
-        name: 'Roger Oliveira',
-    }
+    { uuid: 'c648d64a-11cc-442f-b63e-3ff0e68f97ea', name: 'Paulo Martins' },
+    { uuid: '654aa5c0-86c7-4c14-9d4e-b49788fc75cd', name: 'Marcos Tito' },
+    { uuid: '5c83c9a6-b3f5-482b-a6e0-1908360dbb84', name: 'Roger Oliveira' }
 ]
 
-const headers = new Headers({
-    'Content-Type': 'application/json'
-});
-
+const headers = new Headers({ 'Content-Type': 'application/json' });
 const config = {
     method: 'POST',
     body: {},
@@ -65,19 +48,34 @@ const getTrendingAssets = () => {
     return trendingCoins;
 }
 
-const getLastTransactions = () => {
-    return lastTransactions;
+const getLastTransactions = (userKey) => {
+    if (!userKey) return [];
+
+    const localTransactionKey = `${LocalStorage.LAST_TRANSACTIONS_KEY}${userKey}`;
+    return LocalStorage.get(localTransactionKey) || [];
 }
 
 const getContacts = () => {
     return contactList;
 }
 
+const updateLastTransactions = (data) => {
+    if (!data) return;
+
+    const userHash = data.from;
+    const userDataKey = `${LocalStorage.LAST_TRANSACTIONS_KEY}${userHash}`;
+    const transactions = LocalStorage.get(userDataKey) || [];
+
+    transactions.unshift(data);
+    LocalStorage.set(userDataKey, transactions);
+}
+
 export {
     api,
     headers,
     getAssets,
+    getContacts,
     getLastTransactions,
     getTrendingAssets,
-    getContacts
+    updateLastTransactions
 };

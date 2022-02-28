@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import * as auth from '../Auth';
 import LocalStorage from '../LocalStorage';
 import { headers } from '../Api';
+import strToHash from '../Hash';
 
 const authContextData = {
     signed: false,
@@ -28,8 +29,10 @@ const AuthProvider = ({ children }) => {
         const response = await auth.signIn(username, password);
 
         if (response.access_token) {
-            setUser({ username, password, token: response.access_token });
-            LocalStorage.set(LocalStorage.USER_KEY, { username, token: response.access_token });
+            const hash = strToHash(`${response.access_token.slice(0, 10)}${username}`);
+
+            setUser({ username, password, token: response.access_token, hash });
+            LocalStorage.set(LocalStorage.USER_KEY, { username, token: response.access_token, hash });
             authContextData.user = user;
             authContextData.signed = true;
         }

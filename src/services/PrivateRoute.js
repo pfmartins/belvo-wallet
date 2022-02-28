@@ -8,5 +8,5 @@ const PrivateRoute = ({ children }) => {
 };
 
 export {
-    PrivateRoute,
+    PrivateRoute
 }

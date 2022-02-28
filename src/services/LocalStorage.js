@@ -1,5 +1,6 @@
 const __storage = localStorage;
 const USER_KEY = 'bw_user';
+const LAST_TRANSACTIONS_KEY = 'bw_transactions_';
 
 const get = (key) => {
     if (!__storage.getItem(key)) return;
@@ -19,7 +20,8 @@ const LocalStorage = {
     get,
     set,
     remove,
-    USER_KEY
+    USER_KEY,
+    LAST_TRANSACTIONS_KEY
 }
 
 export default LocalStorage;
