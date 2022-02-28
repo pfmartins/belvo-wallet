@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DialogContentText from '@mui/material/DialogContentText';
+import CircularProgress from '@mui/material/CircularProgress';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import FormControl from '@mui/material/FormControl';
@@ -14,36 +15,45 @@ import Select from '@mui/material/Select';
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
+import * as api from '../../../services/Api';
 
-
-// import {
-//     InputLabel,
-//     // MenuItem,
-//     // FormControl,
-//     // Select,
-//     // Dialog,
-//     // DialogActions,
-//     // DialogContent,
-//     // DialogContentText,
-//     // DialogTitle,
-//     // TextField,
-//     // Button,
-//     // SendIcon
-// } from './MaterialUi';
 import './TransactionDialog.css';
 
 const TransactionDialog = (props) => {
-    const { open, handleClose, transactionType, user } = props;
+    const { open, handleClose, transactionType, transactTo, assets } = props;
+    const isReceive = transactionType === 'receive';
+    const infoAmountDefault = !isReceive ? 'Please select asset to check availability.' : '';
     const [amount, setAmount] = useState('');
-    const [crypto, setCrypto] = useState('');
+    const [selectedAsset, setSelectedAsset] = useState({});
     const [buttonColor, setButtonColor] = useState('');
+    const [error, setError] = useState('');
+    const [disableSubmit, setDisableSubmit] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [amountInfo, setAmountInfo] = useState(infoAmountDefault);
+    const [assetError, setAssetError] = useState('');
 
     const handleCryptoChange = (event) => {
-        setCrypto(event.target.value);
+        const asset = event.target.value;
+        if (!isReceive) setAmountInfo(`You have ${asset.amount} ${asset.name} available.`);
+
+        setAssetError('');
+        setSelectedAsset(asset);
     }
 
     const handleAmountChange = (event) => {
-        setAmount(event.target.value);
+        const amountSelected = event.target.value;
+        if (!isReceive) setAmountInfo(`You have ${selectedAsset.amount} ${selectedAsset.name} available.`)
+
+        setError('');
+        if (selectedAsset.amount < amountSelected && !isReceive) {
+            setAmountInfo('');
+            setDisableSubmit(true);
+            setError(`You don't have amount of asset available. Available amount for this asset is ${selectedAsset.amount}.`);
+        } else {
+            setDisableSubmit(false);
+        }
+
+        setAmount(amountSelected);
     }
 
     const onClose = (event, reason) => {
@@ -52,23 +62,47 @@ const TransactionDialog = (props) => {
     }
 
     const executeTransaction = () => {
+        setLoading(true);
+
         if (!amount || amount <= 0) {
-            console.log('errorsadsdas')
+            setError('Please, set a valid amount.');
+            return;
         }
-        console.log('amount', amount)
-        console.log('crypto', crypto)
+
+        if (!selectedAsset?.name) {
+            setAssetError('Please, set a valid asset.');
+            return;
+        }
+
+
+        const formData = {
+            to: transactTo.name,
+            type: transactionType,
+            asset: selectedAsset.name,
+            totalTransaction: selectedAsset.currentValue * amount
+        }
+
+        console.log('formData', formData)
+    }
+
+    const resetForm = () => {
+        setError('');
+        setAmount('');
+        setAmountInfo('');
+        setSelectedAsset({});
+        setLoading(false);
     }
 
     useEffect(() => {
-        if (transactionType === 'send') setButtonColor('');
-        if (transactionType === 'receive') setButtonColor('success');
-    }, [transactionType])
+        isReceive ? setButtonColor('success') : setButtonColor('');
+        if (open) resetForm();
+    }, [isReceive, open])
 
     return (
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>
-                {transactionType === 'send' && <div><b>Send</b> to {user?.name}</div>}
-                {transactionType === 'receive' && <div><b>Receive</b> from {user?.name}</div>}
+                {!isReceive && <div><b>Send</b> to {transactTo?.name}</div>}
+                {isReceive && <div><b>Receive</b> from {transactTo?.name}</div>}
                 <IconButton
                     aria-label="close"
                     onClick={handleClose}
@@ -77,8 +111,7 @@ const TransactionDialog = (props) => {
                         right: 8,
                         top: 8,
                         color: (theme) => theme.palette.grey[500],
-                    }}
-                >
+                    }}>
                     <CloseIcon />
                 </IconButton>
             </DialogTitle>
@@ -88,46 +121,49 @@ const TransactionDialog = (props) => {
                     To complete this transaction, input the amount and select an asset to {transactionType}.
                 </DialogContentText>
 
-                <div className="transaction__form">
-                    <FormControl sx={{ width: '50%' }}>
-                        <InputLabel id="asset-label">Asset</InputLabel>
-                        <Select
-                            autoFocus
-                            labelId="asset-label"
-                            id="demo-simple-select"
-                            value={crypto}
-                            label="crypto"
-                            onChange={handleCryptoChange}
-                        >
-                            <MenuItem value="''">Select</MenuItem>
-                            <MenuItem value='ETH'>ETH (Etherum)</MenuItem>
-                            <MenuItem value='BTC'>BTC (Bitcoin)</MenuItem>
-                            <MenuItem value='ADA'>ADA (Cardano)</MenuItem>
-                            <MenuItem value='SOL'>SOL (Solana)</MenuItem>
-                            <MenuItem value='DOGE'>DOGE (Dogecoin)</MenuItem>
-                            <MenuItem value='CRO'>CRO (Crypto.com)</MenuItem>
-                        </Select>
-                    </FormControl>
+                {loading && <div className="form__loader"><CircularProgress size={25} thickness={4} color="inherit" /></div>}
+                {!loading &&
+                    <div className="transaction__form">
+                        <FormControl sx={{ width: '50%' }}>
+                            <InputLabel id="asset-label">Asset</InputLabel>
+                            <Select
+                                autoFocus
+                                labelId="asset-label"
+                                id="demo-simple-select"
+                                value={selectedAsset}
+                                label="crypto"
+                                onChange={(e) => handleCryptoChange(e)}
+                            >
+                                <MenuItem value="''">Select</MenuItem>
+                                {assets.map((asset, index) => {
+                                    return (
+                                        <MenuItem key={index} value={asset}>{asset.name}</MenuItem>
+                                    )
+                                })}
+                            </Select>
+                            {assetError && <div className='label--error'>{assetError}</div>}
+                        </FormControl>
 
-                    <FormControl sx={{ width: '50%' }}>
-                        {/* <InputLabel id="demo-simple-select-label">Amount</InputLabel> */}
-                        <TextField
-                            id="name"
-                            label="Amount"
-                            type="number"
-                            fullWidth
-                            variant="outlined"
-                            value={amount}
-                            onChange={handleAmountChange}
-                        />
-                    </FormControl>
-                </div>
+                        <FormControl sx={{ width: '50%' }}>
+                            <TextField
+                                id="name"
+                                label="Amount"
+                                type="number"
+                                fullWidth
+                                variant="outlined"
+                                value={amount}
+                                onChange={handleAmountChange}
+                            />
+                            {error && <div className='label--error'>{error}</div>}
+                            {amountInfo && <div className='label--info'>{amountInfo}</div>}
+                        </FormControl>
+                    </div>}
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" startIcon={<CloseIcon />} onClick={handleClose}>
+                <Button disabled={loading} variant="outlined" startIcon={<CloseIcon />} onClick={handleClose}>
                     Cancel
                 </Button>
-                <Button variant="contained" onClick={executeTransaction} className={`transaction__btn--${buttonColor}`}>
+                <Button variant="contained" disabled={disableSubmit || !amount || loading} onClick={executeTransaction} className={`transaction__btn--${buttonColor}`}>
                     {transactionType === 'send' && 'Send'}
                     {transactionType === 'receive' && 'Receive'}
                     {transactionType === 'send' && <UploadIcon />}
