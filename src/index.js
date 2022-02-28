@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import App from './App';
 import reportWebVitals from './config/reportWebVitals';
 import Login from './domains/login/Login';
-import NotFound from './components/not-found/NotFound';
+import { NotFound } from './components';
 
 import { AuthProvider } from './services/context/AuthContext';
 
