@@ -38,7 +38,6 @@ const Login = () => {
     const [loginError, setLoginError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    console.log('signed login', signed)
     const handleSubmit = (event) => {
         event.preventDefault();
         setLoginError('');
@@ -61,7 +60,6 @@ const Login = () => {
             throw error;
         });
     };
-
 
     useEffect(() => {
         if (signed) navigate('/dashboard');

@@ -16,11 +16,13 @@ import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import * as api from '../../../services/Api';
+import { useAuth } from '../../../services/context/AuthContext';
 
 import './TransactionDialog.css';
 
 const TransactionDialog = (props) => {
-    const { open, handleClose, transactionType, transactTo, assets } = props;
+    const { open, handleClose, handleSubmit, transactionType, transactTo, assets } = props;
+    const { user } = useAuth();
     const isReceive = transactionType === 'receive';
     const infoAmountDefault = !isReceive ? 'Please select asset to check availability.' : '';
     const [amount, setAmount] = useState('');
@@ -74,15 +76,22 @@ const TransactionDialog = (props) => {
             return;
         }
 
-
         const formData = {
-            to: transactTo.name,
+            id: Math.random().toString(36).substr(2, 9),
+            to: transactTo,
             type: transactionType,
+            from: user.hash,
             asset: selectedAsset.name,
-            totalTransaction: selectedAsset.currentValue * amount
+            currentDate: new Date(),
+            totalTransaction: (selectedAsset.currentValue * amount).toFixed(2)
         }
 
-        console.log('formData', formData)
+        /** Simulate api call */
+        setTimeout(() => {
+            api.updateLastTransactions(formData);
+            handleSubmit();
+            setLoading(false);
+        }, 2000)
     }
 
     const resetForm = () => {
@@ -164,10 +173,10 @@ const TransactionDialog = (props) => {
                     Cancel
                 </Button>
                 <Button variant="contained" disabled={disableSubmit || !amount || loading} onClick={executeTransaction} className={`transaction__btn--${buttonColor}`}>
-                    {transactionType === 'send' && 'Send'}
-                    {transactionType === 'receive' && 'Receive'}
-                    {transactionType === 'send' && <UploadIcon />}
-                    {transactionType === 'receive' && <DownloadIcon />}
+                    {!isReceive && 'Send'}
+                    {!isReceive && <UploadIcon />}
+                    {isReceive && 'Receive'}
+                    {isReceive && <DownloadIcon />}
                 </Button>
             </DialogActions>
         </Dialog >

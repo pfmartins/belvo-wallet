@@ -18,7 +18,7 @@ const transationTypes = {
     receive: 'receive'
 }
 
-export default function DataList({ items }) {
+export default function DataList({ items, onSubmitTransaction }) {
     const [open, setOpen] = useState(false);
     const [transactionType, setTransactionType] = useState(null);
     const [contactUser, setContactUser] = useState(null);
@@ -37,9 +37,19 @@ export default function DataList({ items }) {
         setContactUser(null);
     }
 
+    const handleSubmitTransaction = () => {
+        onSubmitTransaction();
+        setOpen(false);
+    }
+
     return (
         <>
-            <TransactionDialog open={open} transactionType={transactionType} transactTo={contactUser} handleClose={handleClose} assets={assets} />
+            <TransactionDialog open={open}
+                handleClose={handleClose}
+                handleSubmit={handleSubmitTransaction}
+                transactionType={transactionType}
+                transactTo={contactUser}
+                assets={assets} />
             <Paper elevation={3} className="dashboard__item">
                 <List dense sx={{ width: '100%', bgcolor: 'background.paper', marginTop: '10px' }}>
                     {contactList.map((user) => {

@@ -6,10 +6,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { useAuth } from '../../services/context/AuthContext';
 import './Dashboard.css';
 
-
-
-const Dashboard = (params) => {
-    const { assets, lastTransactions, trendingAssets } = params.props;
+const Dashboard = ({ assets, lastTransactions, trendingAssets }) => {
     const { user } = useAuth();
 
     return (
@@ -57,10 +54,10 @@ const Dashboard = (params) => {
 
                                 {lastTransactions.map((item) => (
                                     <div key={item.id} className="dashboard__list-item dashboard__list-item--four-columns">
-                                        <div>{item.to}</div>
+                                        <div>{item.to.name}</div>
                                         <div className="dashboard__list-item--align-right">{item.type}</div>
                                         <div className="dashboard__list-item--align-right">{item.asset}</div>
-                                        <div className="dashboard__list-item--align-right">{`$${item.totalValue}`}</div>
+                                        <div className="dashboard__list-item--align-right">{`$${item.totalTransaction}`}</div>
                                     </div>
                                 ))}
                             </div>
