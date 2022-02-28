@@ -3,7 +3,6 @@
   background-color: #F5F5F5;
   font-family: "Open Sans", "Source Sans Pro", sans-serif;
 }
-
 .app-header {
   height: 70px;
   display: flex;
@@ -13,7 +12,6 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
-
 .app-header__bar {
   background-color: #1F72FA !important;
 }
@@ -22,35 +20,29 @@
   text-decoration: none;
 
 }
-
 .app-header__link:hover {
   text-decoration: underline;
 }
-
 .app__btn {
   max-height: 36px;
   display: flex;
   align-items: center;
 }
-
 .login__container {
   height: 100vh;
   display: flex !important;
   flex-direction: column !important;
   justify-content: center;
 }
-
 .login__logo {
   display: flex;
   justify-content: center;
   margin-bottom: 40px;
 }
-
 .login__alert {
   position: relative;
   height: 20px;
 }
-
 .login__loader {
   height: 36px;
   max-height: 36px;
@@ -64,7 +56,6 @@
   top: 0;
   left: 0;
 }
-
 .account__container {
     flex-grow: 1;
     height: calc(100vh - 70px);
@@ -73,6 +64,27 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+.label--error {
+  color: #f44336;
+  font-size: 12px;
+  line-height: 16px;
+  margin-top: 5px;
+}
+.label--info {
+  color: #004085;
+  font-size: 12px;
+  line-height: 16px;
+  margin-top: 5px;
+}
+
+.form__loader {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+
 }
 
 @keyframes App-logo-spin {
