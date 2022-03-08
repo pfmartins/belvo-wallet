@@ -1,16 +1,9 @@
-import { useContext, createContext } from 'react';
 import { api } from './Api';
 import LocalStorage from './LocalStorage';
-
-const authContext = createContext();
 
 const loggedUser = {
     isAuthenticated: false
 }
-
-const useAuth = () => {
-    return useContext(authContext);
-};
 
 const signIn = (username, password) => {
     const path = '/login';
@@ -29,6 +22,5 @@ const signOut = () => {
 
 export {
     signIn,
-    signOut,
-    useAuth,
+    signOut
 };

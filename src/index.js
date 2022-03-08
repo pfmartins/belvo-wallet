@@ -6,7 +6,7 @@ import App from './App';
 import reportWebVitals from './config/reportWebVitals';
 import Login from './domains/login/Login';
 import { NotFound } from './components';
-
+import { PrivateRoute } from './services/PrivateRoute';
 import { AuthProvider } from './services/context/AuthContext';
 
 import './index.css';
@@ -17,7 +17,7 @@ const Routing = () => {
       <AuthProvider>
         <Routes>
           <Route exact path="/" element={<App />} />
-          <Route path="/dashboard" element={<App />} />
+          <Route path="/dashboard" element={<PrivateRoute><App /></PrivateRoute>} />
           <Route path="/login" element={<Login />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
